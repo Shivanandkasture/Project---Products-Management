@@ -3,10 +3,10 @@ const ObjectId = mongoose.Schema.Types.ObjectId
 
 const orderSchema = mongoose.Schema(
     {
-        userId: { type: ObjectId, requierd: true},
+        userId: { type: ObjectId, requierd: true,ref: "User" },
         items: [{
             _id: false,
-            productId: { type: ObjectId, requierd: true, _id: false },
+            productId: { type: ObjectId, requierd: true, _id: false,ref: "Products"  },
             quantity: { type: Number, requierd: true, min: 1, }
         }],
         totalPrice: { type: Number, required: true },

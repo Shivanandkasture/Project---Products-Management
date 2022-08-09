@@ -8,14 +8,14 @@ const aws = require("../aws/awsS3");
 const createProduct = async (req, res) => {
     try {
         let data = req.body;
-        let productImage = req.files[0];
 
         //------(Destructure)
+
         let { title, description, price, currencyId, style, availableSizes, installments } = data
 
         //<--------------------------------[ Validations ]-------------------------------->
         //------(Body)
-        if (!validators.isValidRequestBody(req.body))
+        if (!validators.isValidRequestBody(data))
             return res.status(400).send({
                 status: false,
                 message:
@@ -24,10 +24,9 @@ const createProduct = async (req, res) => {
 
         //------(title)
         if (!validators.isValidField(title))
-            return res
-                .status(400)
-                .send({ status: false, message: "title is required." });
+            return res.status(400).send({ status: false, message: "title is required." });
         let alreadyTitle = await productModel.findOne({ title })
+
         if (alreadyTitle) return res.status(400).send({ status: false, message: `Title Already used is ${title}` })
 
         //------(description)
@@ -104,6 +103,7 @@ const createProduct = async (req, res) => {
                 });
             }
         }
+        let productImage = req.files[0];
         //------(productImage)
         if (!productImage)
             return res
@@ -140,7 +140,7 @@ let getProductById = async (req, res) => {
 
         //---------[Validations]
 
-        if (!validators.isValidObjectId(productId)) return res.status(400).send({ status: false, message: 'Invalid UserId Format' })
+        if (!validators.isValidObjectId(productId)) return res.status(400).send({ status: false, message: 'Invalid productId Format' })
 
         //---------[Checking productId is Present in Db or not]
 
@@ -218,14 +218,14 @@ let getProduct = async (req, res) => {
         }
         let sortPrice = 1
         if ('priceSort' in filterProduct) {
-            if(filterProduct.priceSort != 1 && filterProduct.priceSort != -1) {
-                return res.status(400).send({status: false, message: 'Price sort can only be 1 or -1'})
+            if (filterProduct.priceSort != 1 && filterProduct.priceSort != -1) {
+                return res.status(400).send({ status: false, message: 'Price sort can only be 1 or -1' })
             }
             if (filterProduct.priceSort == '-1') {
                 sortPrice = -1
             }
         }
-        console.log(sortPrice);
+        // console.log(sortPrice);
         //---------[Find product] 
         let data = await productModel.find({ $and: [newObject, { isDeleted: false }] }).sort({ price: sortPrice })
         if (data.length == 0) return res.status(404).send({ status: false, message: 'Product not found' });
@@ -248,7 +248,7 @@ let getProduct = async (req, res) => {
         }
 
         //---------[Response Send]
-        res.status(200).send({ status: true, message: 'Success', data: data})
+        return res.status(200).send({ status: true, message: 'Success', data: data })
     }
     catch (err) {
         return res.status(500).send({ status: false, message: err.message })
@@ -260,7 +260,7 @@ let updateProducts = async function (req, res) {
     try {
         let productId = req.params.productId;
         let body = req.body;
-        let productImage = req.files[0]
+       
 
         //-------[Validations]
         if (!validators.isValidObjectId(productId)) return res.status(400).send({ status: false, message: 'Invalid productId Format' })
@@ -271,7 +271,7 @@ let updateProducts = async function (req, res) {
                 message:
                     "Invalid request parameter. Please provide user details in request body.",
             });
-        
+
         //---------[Check product is Present in Db or not]
         let checkProduct = await productModel.findOne({ _id: productId, isDeleted: false });
         if (!checkProduct) return res.status(404).send({ status: false, message: "Product Not Found" });
@@ -353,6 +353,7 @@ let updateProducts = async function (req, res) {
             checkProduct.installments = installments;
         }
         //-------[productImage]
+        let productImage = req.files[0]
         if (productImage) {
             if (!validators.isvalidImage(productImage))
                 return res.status(400).send({
@@ -386,7 +387,7 @@ let updateProducts = async function (req, res) {
                 }
                 checkProduct.availableSizes.push(i)
             }
-            checkProduct.availableSizes = [...new Set(checkProduct.availableSizes)]
+            checkProduct.availableSizes = [...new Set(checkProduct.availableSizes)] // remove duplicat value
         }
         //-------[save]
         await checkProduct.save()

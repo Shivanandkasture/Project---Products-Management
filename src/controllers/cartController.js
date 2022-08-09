@@ -49,7 +49,7 @@ let createCart = async function (req, res) {
             });
         }
         //-----[find product in db]
-        let findproduct = await productModel.findOne({ _id: productId, isDeletd: false });
+        let findproduct = await productModel.findOne({ _id: productId, isDeleted: false });
         if (!findproduct) {
             return res.status(404).send({
                 status: false,
@@ -64,7 +64,7 @@ let createCart = async function (req, res) {
                 message: "User not authorised",
             });
         }
-        
+
         //------[find cart with userId or create new cart]------>
         let findUserId = await cartModel.findOne({ userId: userId })
         if (!findUserId) {  //if cart is not present
@@ -155,7 +155,7 @@ let updateCart = async function (req, res) {
                 message: "Not a valid cartId",
             });
         }
-        let findCart = await cartModel.findOne({ _id: cartId , userId: userId });
+        let findCart = await cartModel.findOne({ _id: cartId, userId: userId });
         if (!findCart) {
             return res.status(404).send({
                 status: false,
@@ -178,9 +178,9 @@ let updateCart = async function (req, res) {
         }
 
         if (removeProduct != 1 && removeProduct != 0) {
-            return res.status(404).send({
+            return res.status(400).send({
                 status: false,
-                message: "Remove product is mandatory can only be 1 0r 0",
+                message: "Remove product is mandatory can only be 1 or 0",
             });
         }
         //------[Authorization]
@@ -205,10 +205,10 @@ let updateCart = async function (req, res) {
                     findCart.totalPrice -= price
                     item[i].quantity = 0                                    //set quantity to zero
                 }
-                if (item[i].quantity == 0) {   
+                if (item[i].quantity == 0) {
                     item.splice(i, 1)                                       //if item quantity is zero, remove product from items
                 }
-                isDecrease = true     
+                isDecrease = true
                 break;
             }
         }
@@ -241,7 +241,7 @@ let getCart = async (req, res) => {
 
         if (!validators.isValidObjectId(userId)) {
             return res.status(400).send({
-                status: false,                              
+                status: false,
                 message: "Not a valid userId",
             });
         }
@@ -265,8 +265,8 @@ let getCart = async (req, res) => {
         let findCart = await cartModel.findOne({ userId: userId }).populate({
             path: 'items.productId',
             select:
-              'title price productImage style availableSizes isDeleted',
-          });
+                'title price productImage style availableSizes isDeleted',
+        });
         if (!findCart) {
             return res.status(404).send({
                 status: false,
@@ -290,7 +290,7 @@ let getCart = async (req, res) => {
 let deleteCart = async (req, res) => {
     try {
         let userId = req.params.userId
-        
+
         //=========[Validations]=========>
 
         if (!validators.isValidObjectId(userId)) {
@@ -334,8 +334,8 @@ let deleteCart = async (req, res) => {
 
         // ===[ Response ]===
         return res.status(204).send({})
-        
-        
+
+
     } catch (err) {
         return res.status(500).send({ status: false, message: err.message });
     }

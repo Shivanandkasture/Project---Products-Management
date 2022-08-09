@@ -12,7 +12,7 @@ app.use(multer().any())
 // =============================[ Connect DataBase ]=========================
 mongoose
   .connect(
-    "mongodb+srv://sarhank44:sarhank8299@sarhancluster.fxjt3wn.mongodb.net/gorup6Database",
+    "mongodb+srv://shivanandkasture:GrjERPPxK02MvUW6@cluster0.a35v6.mongodb.net/Product-Mangement-DB?retryWrites=true&w=majority",
     {
       useNewUrlParser: true,
     }
@@ -23,6 +23,6 @@ mongoose
 app.use("/", route);
 
 
-app.listen(process.env.PORT || 3000, function () {
-  console.log("Express app is running on port" + (process.env.PORT || 3000));
+app.listen( 3000, function () {
+  console.log("Express app is running on port" +  3000);
 });

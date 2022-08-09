@@ -9,8 +9,7 @@ const aws = require("../aws/awsS3");
 const createUser = async (req, res) => {
   try {
     let data = req.body;
-    let profileImage = req.files[0];
-
+  
     if (!validators.isValidRequestBody(req.body))
       return res.status(400).send({
         status: false,
@@ -99,6 +98,7 @@ const createUser = async (req, res) => {
         message:
           "Password should consist a minimum of 8 characters and a maximum of 15 characters.",
       });
+
     const saltRounds = 10;
     bcrypt.hash(password, saltRounds, function (err, hash) {
       if (err)
@@ -107,7 +107,7 @@ const createUser = async (req, res) => {
     });
 
     //<-------(Image)--------->
-
+    let profileImage = req.files[0];
     if (!profileImage)
       return res
         .status(400)
@@ -251,11 +251,12 @@ const userLogin = async function (req, res) {
       email: userName,
     });
     if (!user) {
-      return res.status(401).send({
+      return res.status(404).send({
         status: false,
         message: "Email Id not correct",
       });
     }
+   
     if (user) {
       // check user password with hashed password stored in the database
       const validPassword = await bcrypt.compare(password, user.password);
@@ -388,7 +389,7 @@ const updateUser = async (req, res) => {
       if (!validators.isValidField(data.lname))
         return res
           .status(400)
-          .send({ status: false, message: "first Name is required." });
+          .send({ status: false, message: "last Name is required." });
 
       if (!data.lname.match(/^[A-Za-z ]+$/)) {
         return res.status(400).send({
